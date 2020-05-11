@@ -1,64 +1,8 @@
 <?php
 
-    try
-    {
-        $bdd = new PDO('mysql:host=127.0.0.1;dbname=minichat','root','');
-        $bdd->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    }
-    catch (Exception $e)
-    {
-        die('Erreur : ' . $e->getMessage());
-    }
+    require_once('database.php');
 
-    function getIp() {
-        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-            $ip = $_SERVER['HTTP_CLIENT_IP'];
-        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-        } else {
-            $ip = $_SERVER['REMOTE_ADDR'];
-        }
-        
-        return $ip;
-    }
-
-    $currentNickname = $_COOKIE["user_cookie"];
-
-    if(!empty($_POST["message"]) && !empty($_POST["nickname"])) {
-        $message = htmlspecialchars($_POST["message"]);
-        $nickname = htmlspecialchars($_POST["nickname"]);
-
-        setcookie('user_cookie', $nickname);
-        $currentNickname = $nickname;
-
-        // 0 : Je vérifie si le user existe déjà ou pas
-        $userStatement = $bdd->prepare('SELECT * FROM users WHERE nickname = ?');
-        $userStatement->execute([$nickname]);
-
-        $user = $userStatement->fetch(PDO::FETCH_ASSOC);
-
-        //var_dump($user);exit;
-
-        if($user) {
-            $userId = $user["id"];
-        }
-        else {
-            // 1 : J'insère le nouveau user
-            $insertUserStatement = $bdd->prepare('INSERT INTO users (nickname, created_at, ip_address) VALUES (?, ?, ?)');
-            $insertUserStatement->execute([$nickname, date('Y-m-d H:i:s'), getIp()]);
-
-            // 2 : Je récupère le dernier ID généré du user
-            $userId = $bdd->lastInsertId();
-        }
-
-        // 3 : J'insère le message
-        $insertMessageStatement = $bdd->prepare('INSERT INTO messages (user_id, message, ip_address, created_at) VALUES (?, ?, ?, ?)');
-        $insertMessageStatement->execute([$userId, $message, getIp(), date('Y-m-d H:i:s')]);
-    }
-
-
-    $allMessagesStatement = $bdd->query('SELECT messages.*, users.nickname FROM messages INNER JOIN users WHERE users.id = messages.user_id');
-    $allMessages = $allMessagesStatement->fetchAll(PDO::FETCH_ASSOC);
+    $currentNickname = $_COOKIE["user_cookie"] ?? "";
 
     $allUsersStatement = $bdd->query('SELECT * FROM users');
     $allUsers = $allUsersStatement->fetchAll(PDO::FETCH_ASSOC);
@@ -91,19 +35,7 @@
             <div class="col-9" id="messages">
                 <div class="col-12" id="messages-container">
 
-                    <?php foreach($allMessages as $message) : ?>
-                        <div class="card mb-0 message">
-                            <div class="card-body">
-                                <p class="my-0">
-                                    <strong>
-                                        <?=$message["nickname"]?>
-                                    </strong>
-                                    : 
-                                    <span class="badge badge-secondary float-right created_at"><?=$message["message"]?></span>
-                                </p>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
+                    <?php include('get_messages.php'); ?>
 
                 </div>
             </div>
@@ -117,27 +49,25 @@
 </main>
 
 <div id="talkBar" class="bg-primary">
-    <form action="index.php" method="post">
-        <div class="input-group">
-            <input type="text"
-                   id="pseudo"
-                   class="form-control input-group-addon col-2"
-                   name="nickname"
-                   placeholder="Pseudo"
-                   minlength="2"
-                   required
-                   value="<?=$currentNickname?>">
-            <input type="text"
-                   id="message"
-                   class="form-control col-8"
-                   name="message"
-                   placeholder="Tape ton message ici"
-                   minlength="1"
-                   maxlength="255"
-                   required>
-            <button type="submit" class="btn btn-success col-2">Envoyer</button>
-        </div>
-    </form>
+    <div class="input-group">
+        <input type="text"
+                id="pseudo"
+                class="form-control input-group-addon col-2"
+                name="nickname"
+                placeholder="Pseudo"
+                minlength="2"
+                required
+                value="<?=$currentNickname?>">
+        <input type="text"
+                id="message"
+                class="form-control col-8"
+                name="message"
+                placeholder="Tape ton message ici"
+                minlength="1"
+                maxlength="255"
+                required>
+        <button class="btn btn-success col-2" id="sendBtn" onclick="sendMessage()">Envoyer</button>
+    </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"
@@ -154,8 +84,20 @@
         $.get('/get_messages.php', function (messagesHtml) {
             document.querySelector('#messages-container').innerHTML = messagesHtml;
             setTimeout(refreshMessages, 3000);
+            window.scrollTo(0, 100000);
             console.log("Messages rafraîchis")
         })
+    }
+
+    function sendMessage() {
+        $.post('/send_message.php', {
+            nickname: document.querySelector('#pseudo').value,
+            message: document.querySelector('#message').value
+        }, function (messagesHtml) {
+            document.querySelector('#messages-container').innerHTML = messagesHtml;
+            document.querySelector('#message').value = ""
+            window.scrollTo(0, 100000);
+        });
     }
 
     $(function () {
