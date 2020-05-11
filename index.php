@@ -2,11 +2,7 @@
 
     require_once('database.php');
 
-    $currentNickname = $_COOKIE["user_cookie"];
-
-
-    $allMessagesStatement = $bdd->query('SELECT messages.*, users.nickname FROM messages INNER JOIN users WHERE users.id = messages.user_id');
-    $allMessages = $allMessagesStatement->fetchAll(PDO::FETCH_ASSOC);
+    $currentNickname = $_COOKIE["user_cookie"] ?? "";
 
     $allUsersStatement = $bdd->query('SELECT * FROM users');
     $allUsers = $allUsersStatement->fetchAll(PDO::FETCH_ASSOC);
@@ -39,19 +35,7 @@
             <div class="col-9" id="messages">
                 <div class="col-12" id="messages-container">
 
-                    <?php foreach($allMessages as $message) : ?>
-                        <div class="card mb-0 message">
-                            <div class="card-body">
-                                <p class="my-0">
-                                    <strong>
-                                        <?=$message["nickname"]?>
-                                    </strong>
-                                    : 
-                                    <span class="badge badge-secondary float-right created_at"><?=$message["message"]?></span>
-                                </p>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
+                    <?php include('get_messages.php'); ?>
 
                 </div>
             </div>
@@ -82,7 +66,7 @@
                 minlength="1"
                 maxlength="255"
                 required>
-        <button class="btn btn-success col-2" id="sendBtn" onclick="sendMsg()">Envoyer</button>
+        <button class="btn btn-success col-2" id="sendBtn" onclick="sendMessage()">Envoyer</button>
     </div>
 </div>
 
@@ -100,23 +84,20 @@
         $.get('/get_messages.php', function (messagesHtml) {
             document.querySelector('#messages-container').innerHTML = messagesHtml;
             setTimeout(refreshMessages, 3000);
+            window.scrollTo(0, 100000);
             console.log("Messages rafraîchis")
         })
     }
 
-    function sendMsg() {
-        var btn = document.querySelector('#sendBtn')
-        btn.textContent = 'Chargement..'
-        btn.setAttribute('disabled', true);
-
+    function sendMessage() {
         $.post('/send_message.php', {
-            nickname : document.querySelector('#pseudo').value,
-            message : document.querySelector('#message').value,
+            nickname: document.querySelector('#pseudo').value,
+            message: document.querySelector('#message').value
         }, function (messagesHtml) {
             document.querySelector('#messages-container').innerHTML = messagesHtml;
-            btn.textContent = 'Envoyer'
-            btn.removeAttribute('disabled');
-        })
+            document.querySelector('#message').value = ""
+            window.scrollTo(0, 100000);
+        });
     }
 
     $(function () {

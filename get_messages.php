@@ -2,7 +2,12 @@
 
 require_once('database.php');
 
-$allMessagesStatement = $bdd->query('SELECT messages.*, users.nickname FROM messages INNER JOIN users WHERE users.id = messages.user_id');
+$allMessagesStatement = $bdd->query(
+    'SELECT messages.*, users.nickname 
+    FROM messages 
+    INNER JOIN users 
+    WHERE users.id = messages.user_id 
+    ORDER BY messages.created_at');
 $allMessages = $allMessagesStatement->fetchAll(PDO::FETCH_ASSOC);
 
 foreach($allMessages as $message) : ?>

@@ -46,4 +46,5 @@ if(!empty($_POST["message"]) && !empty($_POST["nickname"])) {
     $insertMessageStatement->execute([$userId, $message, getIp(), date('Y-m-d H:i:s')]);
 }
 
+
 include('get_messages.php');
