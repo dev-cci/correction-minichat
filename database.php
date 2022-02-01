@@ -1,8 +1,10 @@
 <?php
 
+require_once('./env.php');
+
 try
 {
-    $bdd = new PDO('mysql:host=127.0.0.1;dbname=correction_minichat','root','');
+    $bdd = new PDO("mysql:host=$DB_HOST;dbname=$DB_NAME", $DB_USER, $DB_PASSWORD);
     $bdd->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 }
 catch (Exception $e)
