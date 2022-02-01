@@ -81,20 +81,28 @@
 
 <script>
     function refreshMessages() {
-        $.get('/get_messages.php', function (messagesHtml) {
-            document.querySelector('#messages-container').innerHTML = messagesHtml;
+        fetch('./get_messages.php')
+        .then(response => response.text())
+        .then(messages => {
+            document.querySelector('#messages-container').innerHTML = messages;
             setTimeout(refreshMessages, 3000);
             window.scrollTo(0, 100000);
             console.log("Messages rafraîchis")
-        })
+        });
     }
 
     function sendMessage() {
-        $.post('/send_message.php', {
-            nickname: document.querySelector('#pseudo').value,
-            message: document.querySelector('#message').value
-        }, function (messagesHtml) {
-            document.querySelector('#messages-container').innerHTML = messagesHtml;
+        let data = new FormData();
+        data.append('nickname', document.querySelector('#pseudo').value);
+        data.append('message', document.querySelector('#message').value);
+
+        fetch('./send_message.php', {
+            method: 'POST',
+            body: data
+        })
+        .then(response => response.text())
+        .then(messages => {
+            document.querySelector('#messages-container').innerHTML = messages;
             document.querySelector('#message').value = ""
             window.scrollTo(0, 100000);
         });
