@@ -1,6 +1,8 @@
 <?php
 
 require_once('database.php');
+require('./RandomColor.php');
+
 
 function getIp() {
     if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
@@ -10,7 +12,7 @@ function getIp() {
     } else {
         $ip = $_SERVER['REMOTE_ADDR'];
     }
-    
+
     return $ip;
 }
 
@@ -33,9 +35,12 @@ if(!empty($_POST["message"]) && !empty($_POST["nickname"])) {
         $userId = $user["id"];
     }
     else {
+        // 0 : Je génere une couleur aléatoire
+        $color = Colors\RandomColor::one();
+
         // 1 : J'insère le nouveau user
-        $insertUserStatement = $bdd->prepare('INSERT INTO users (nickname, created_at, ip_address) VALUES (?, ?, ?)');
-        $insertUserStatement->execute([$nickname, date('Y-m-d H:i:s'), getIp()]);
+        $insertUserStatement = $bdd->prepare('INSERT INTO users (nickname, created_at, ip_address, color) VALUES (?, ?, ?, ?)');
+        $insertUserStatement->execute([$nickname, date('Y-m-d H:i:s'), getIp(), $color]);
 
         // 2 : Je récupère le dernier ID généré du user
         $userId = $bdd->lastInsertId();

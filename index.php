@@ -85,9 +85,9 @@
         .then(response => response.text())
         .then(messages => {
             document.querySelector('#messages-container').innerHTML = messages;
-            setTimeout(refreshMessages, 3000);
-            window.scrollTo(0, 100000);
-            console.log("Messages rafraîchis")
+            // setTimeout(refreshMessages, 3000);
+            // window.scrollTo(0, 100000);
+            // console.log("Messages rafraîchis")
         });
     }
 
