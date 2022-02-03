@@ -27,9 +27,9 @@
                 </div>
             </div>
             <div class="col-3">
-                <?php foreach($allUsers as $user) : ?>
-                    <div><?=$user["nickname"]?></div>
-                <?php endforeach; ?>
+
+                <?php include('get_users.php'); ?>
+
             </div>
         </section>
     </div>
