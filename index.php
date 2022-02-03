@@ -49,7 +49,7 @@
 </main>
 
 <div id="talkBar" class="bg-primary">
-    <div class="input-group">
+    <form method="post" action="send_message.php" class="input-group">
         <input type="text"
                 id="pseudo"
                 class="form-control input-group-addon col-2"
@@ -66,7 +66,7 @@
                 minlength="1"
                 maxlength="255"
                 required>
-        <button class="btn btn-success col-2" id="sendBtn" onclick="sendMessage()">Envoyer</button>
+        <button class="btn btn-success col-2" id="sendBtn">Envoyer</button>
     </div>
 </div>
 
@@ -79,38 +79,5 @@
         integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
         crossorigin="anonymous"></script>
 
-<script>
-    function refreshMessages() {
-        fetch('./get_messages.php')
-        .then(response => response.text())
-        .then(messages => {
-            document.querySelector('#messages-container').innerHTML = messages;
-            // setTimeout(refreshMessages, 3000);
-            // window.scrollTo(0, 100000);
-            // console.log("Messages rafraîchis")
-        });
-    }
-
-    function sendMessage() {
-        let data = new FormData();
-        data.append('nickname', document.querySelector('#pseudo').value);
-        data.append('message', document.querySelector('#message').value);
-
-        fetch('./send_message.php', {
-            method: 'POST',
-            body: data
-        })
-        .then(response => response.text())
-        .then(messages => {
-            document.querySelector('#messages-container').innerHTML = messages;
-            document.querySelector('#message').value = ""
-            window.scrollTo(0, 100000);
-        });
-    }
-
-    $(function () {
-        refreshMessages();
-    });
-</script>
 </body>
 </html>

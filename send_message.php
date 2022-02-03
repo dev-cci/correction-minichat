@@ -52,4 +52,4 @@ if(!empty($_POST["message"]) && !empty($_POST["nickname"])) {
 }
 
 
-include('get_messages.php');
+header('Location: index.php');
