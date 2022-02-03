@@ -1,17 +1,4 @@
-<?php
-
-    require_once('database.php');
-
-    $currentNickname = $_COOKIE["user_cookie"] ?? "";
-
-    $allUsersStatement = $bdd->query('SELECT * FROM users');
-    $allUsers = $allUsersStatement->fetchAll(PDO::FETCH_ASSOC);
-
-
-    //echo '<pre>';
-    //print_r($allMessages);exit;
-
-?><!doctype html>
+<!doctype html>
 <html lang="fr">
 <head>
     <!-- Required meta tags -->
