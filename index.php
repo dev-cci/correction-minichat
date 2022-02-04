@@ -44,7 +44,7 @@
                 placeholder="Pseudo"
                 minlength="2"
                 required
-                value="<?=$currentNickname?>">
+                value="">
         <input type="text"
                 id="message"
                 class="form-control col-8"
